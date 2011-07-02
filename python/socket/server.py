@@ -34,16 +34,33 @@ class NotListeningException(Exception):
     return self.msg
 
 
+class ClientSession(object):
+  """Session with a remote client"""
+  def __init__(self, sock, address, *args, **kwargs):
+    super(ClientSession, self).__init__()
+    self._conn = sock
+    self._address = address
+    
+  conn = property(lambda self: self._conn, doc="Client connection")
+  address = property(lambda self: self._address, doc="Client address")
+
+  def __repr__(self):
+    return str(self._address)
+
+  def __str__(self):
+    return self.__repr__()
+
+
 class HandlerResponse(object):
   """Base class of HandlerResponse"""
 
   name = "Base handler response"
 
-  def __init__(self, conn, *args, **kwargs):
+  def __init__(self, session, *args, **kwargs):
     super(HandlerResponse, self).__init__()
-    self._conn = conn
+    self._session = session
 
-  conn = property(lambda self: self._conn, doc="Client connection")
+  session = property(lambda self: self._session, doc="Client session")
 
 
 class RequestComplete(HandlerResponse):
@@ -65,7 +82,7 @@ class ClientDisconnect(HandlerResponse):
 
 
 
-class Server(object):
+class SessionServer(object):
 
   DEFAULT = {
     'NB_HANDLER' : 5,
@@ -87,7 +104,7 @@ class Server(object):
                address=DEFAULT['ADDR'], port=DEFAULT['PORT'], 
                family=DEFAULT['SOCK_FAMILY'], type=DEFAULT['SOCK_TYPE'],
                pollTime=DEFAULT['POLL_TIME'], reuse=DEFAULT['REUSE']):
-    super(Server, self).__init__()
+    super(SessionServer, self).__init__()
     self.handlerClass = handlerClass
     self.nbHandler = nbHandler
     self.sock = socket.socket(family, type)
@@ -100,8 +117,8 @@ class Server(object):
     self.running = False
     self.verbose = False
 
-    self._clientConn = {} #Contain all active connections
-    self._processRequest = [] #List of all request being currently processed
+    self._clientSession = {} #Contain all active sessions
+    self._activeSession = [] #List of all session being currently processed
 
     self._requestQueue = Queue.Queue(100) #Put request for the handler threads
     self._responseQueue = Queue.Queue(100) #Response from the handler threads
@@ -211,21 +228,23 @@ class Server(object):
 
 
   def handleNewConnection(self, conn, address):
-    """ Add new connection to the _clientConn """
-    self._clientConn[conn] = address
+    """ Add new session to the _clientSession """
+    self._clientSession[conn] = ClientSession(conn, address)
 
 
   def handleRequest(self, conn):
     """Handle a client request. conn arg is the socket 
     connected to the client."""
 
-    self._print("Handling new request from %s" % repr(self._clientConn[conn]))
-    self._requestQueue.put(conn)
-    if conn in self._processRequest:
+    session = self._clientSession[conn]
+
+    self._print("Handling new request from %s" % session)
+    self._requestQueue.put(session)
+    if session in self._activeSession:
       #TODO shouldn't happen
       pass
     else:
-      self._processRequest.append(conn)
+      self._activeSession.append(session)
 
   
   def handleResponse(self):
@@ -238,20 +257,33 @@ class Server(object):
         pass
 
       if isinstance(resp, ClientDisconnect):
-        self.closeConnection(resp.conn)
+        self.closeConnection(resp.session)
 
-      if resp.conn in self._processRequest:
-        #resp.conn should always be there, unless we've been tricked...
-        self._processRequest.remove(resp.conn)
+      if resp.session in self._activeSession:
+        #resp.session should always be there, unless we've been tricked...
+        self._activeSession.remove(resp.session)
 
 
   def closeConnection(self, conn):
-    """Close remote client connection."""
-    self._print("Closing connection with %s" % repr(self._clientConn[conn]))
-    conn.shutdown(socket.SHUT_RDWR)
-    conn.close()
-    #Remove connection from server list.
-    del self._clientConn[conn]
+    """Close remote client connection. conn arg can either be a socket or a
+    session"""
+
+    if isinstance(conn, ClientSession):
+      clSock = conn.conn
+      session = conn
+
+    else:
+      clSock = conn
+      session = self._clientSession[conn]
+
+    assert isinstance(clSock, socket._socketobject), "Close connection must "\
+           "be called on a socket or session."
+
+    self._print("Closing connection with %s" % session)
+    clSock.shutdown(socket.SHUT_RDWR)
+    clSock.close()
+    #Remove session from server list.
+    del self._clientSession[clSock]
 
 
   def setVerbose(self, verbose):
@@ -261,7 +293,8 @@ class Server(object):
   
   def _getIdleConnection(self):
     """Return a list of connection that are not being currently served."""
-    return [x for x in self._clientConn.keys() if x not in self._processRequest]
+    return [x.conn for x in self._clientSession.values() if x not in
+            self._activeSession]
 
 
   def _getHandlerResponses(self):
@@ -309,12 +342,12 @@ class requestPrinter(threading.Thread):
 
     while True:
 
-      request = self.reqQ.get()
-      data = request.recv(1024).strip()
+      session = self.reqQ.get()
+      data = session.conn.recv(1024).strip()
 
       if not data:
         self.reqQ.task_done()
-        self.respQ.put(ClientDisconnect(request))
+        self.respQ.put(ClientDisconnect(session))
         
       else:
 
@@ -323,12 +356,12 @@ class requestPrinter(threading.Thread):
 
         #No more data, notify server that request is done.
         self.reqQ.task_done()
-        self.respQ.put(RequestComplete(request))
+        self.respQ.put(RequestComplete(session))
 
 
     
 def main():
-  server = Server(requestPrinter)
+  server = SessionServer(requestPrinter)
   server.setVerbose(True)
   server.run()
 
