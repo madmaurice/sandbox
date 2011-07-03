@@ -5,6 +5,10 @@
 Basic server largely influenced on SocketServer.py. However this server manage
 to handle multiple connections by sending request to handler threads. This is not
 really SocketServer.ThreadingMixIn because a thread is not created on each new connection.
+Each client connection is interpreted as a BaseClientSession. The server can be
+customized easily by defining handlers and sessions.
+Server.handleNewConnection() can be overriden to define how the sessions are
+created.
 
 """
 
@@ -34,10 +38,20 @@ class NotListeningException(Exception):
     return self.msg
 
 
-class ClientSession(object):
+class ServerException(Exception):
+  """Server internal exception"""
+  def __init__(self, msg):
+    super(ServerException, self).__init__()
+    self.msg = msg
+
+  def __str__(self):
+    return self.msg
+    
+
+class BaseClientSession(object):
   """Session with a remote client"""
   def __init__(self, sock, address, *args, **kwargs):
-    super(ClientSession, self).__init__()
+    super(BaseClientSession, self).__init__()
     self._conn = sock
     self._address = address
     
@@ -100,12 +114,14 @@ class SessionServer(object):
     'REUSE' : False
   }
 
-  def __init__(self, handlerClass, nbHandler=DEFAULT['NB_HANDLER'], 
-               address=DEFAULT['ADDR'], port=DEFAULT['PORT'], 
-               family=DEFAULT['SOCK_FAMILY'], type=DEFAULT['SOCK_TYPE'],
-               pollTime=DEFAULT['POLL_TIME'], reuse=DEFAULT['REUSE']):
+  def __init__(self, handlerClass, sessionClass, 
+               nbHandler=DEFAULT['NB_HANDLER'], address=DEFAULT['ADDR'],
+               port=DEFAULT['PORT'], family=DEFAULT['SOCK_FAMILY'],
+               type=DEFAULT['SOCK_TYPE'], pollTime=DEFAULT['POLL_TIME'],
+               reuse=DEFAULT['REUSE']):
     super(SessionServer, self).__init__()
     self.handlerClass = handlerClass
+    self.sessionClass = sessionClass
     self.nbHandler = nbHandler
     self.sock = socket.socket(family, type)
     self.address = address
@@ -138,12 +154,10 @@ class SessionServer(object):
     try:
       self.sock.bind((self.address, self.port))
     except socket.error, e:
-      print("Failed to bind socket to %s:%s ->%s" % (self.address, self.port, e))
-      return False
+      raise ServerException("Failed to bind socket to %s:%s ->%s" % 
+                            (self.address, self.port, e))
 
     self.bound = True
-
-    return True
 
   
   def listen(self, backlog=1):
@@ -155,8 +169,8 @@ class SessionServer(object):
     """Stop the server, must be called from another thread as run or it will
     deadlock (stuck while waiting for self._stop.wait())"""
 
-    #TODO check that this work...
     self.running = False
+    #Wait for server loop to stop
     self._stop.wait()
     self.bound = False
     self.listening = False
@@ -165,7 +179,6 @@ class SessionServer(object):
   def fileno(self):
     """Return socket file descriptor. 
     Required by select function."""
-
     return self.sock.fileno()
 
   
@@ -229,7 +242,7 @@ class SessionServer(object):
 
   def handleNewConnection(self, conn, address):
     """ Add new session to the _clientSession """
-    self._clientSession[conn] = ClientSession(conn, address)
+    self._clientSession[conn] = self.sessionClass(conn, address)
 
 
   def handleRequest(self, conn):
@@ -241,8 +254,9 @@ class SessionServer(object):
     self._print("Handling new request from %s" % session)
     self._requestQueue.put(session)
     if session in self._activeSession:
-      #TODO shouldn't happen
-      pass
+      #This should never happen... unless something goes really bad!
+      raise ServerException("Handle request fail because session %s is "\
+                            "already active" % session)
     else:
       self._activeSession.append(session)
 
@@ -268,7 +282,7 @@ class SessionServer(object):
     """Close remote client connection. conn arg can either be a socket or a
     session"""
 
-    if isinstance(conn, ClientSession):
+    if isinstance(conn, self.sessionClass):
       clSock = conn.conn
       session = conn
 
@@ -324,17 +338,27 @@ class SessionServer(object):
     self.sock.close()
     
 
+class BaseHandler(threading.Thread):
+  """Base class for handler class"""
 
-class requestPrinter(threading.Thread):
-  
   def __init__(self, handlerId, requestQ, responseQ):
     threading.Thread.__init__(self)
-    #We want to exist if main thread die.
     self.daemon = True
-    self.name = "Request printer"
     self.handlerId = handlerId
     self.reqQ = requestQ
     self.respQ = responseQ
+    self.name = "Base Handler"
+
+  def run(self):
+    pass
+    
+
+class RequestPrinter(BaseHandler):
+  
+  def __init__(self, handlerId, requestQ, responseQ):
+    #We want to exist if main thread die.
+    super(RequestPrinter, self).__init__(handlerId, requestQ, responseQ)
+    self.name = "Request printer"
 
 
   def run(self):
@@ -359,11 +383,26 @@ class requestPrinter(threading.Thread):
         self.respQ.put(RequestComplete(session))
 
 
+def runServer(server):
+  server.run()
+  
     
 def main():
-  server = SessionServer(requestPrinter)
-  server.setVerbose(True)
-  server.run()
+  import thread
+
+  server = SessionServer(RequestPrinter, BaseClientSession)
+  #server.setVerbose(True)
+  thread.start_new_thread(runServer, (server, ))
+  print("Type q to close server")
+
+  while True:
+    msg = raw_input()
+    if msg == 'q':
+      break
+
+  #Close server
+  server.terminate()
+  print("Goodbye!")
 
 
 if __name__ == '__main__':
