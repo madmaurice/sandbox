@@ -13,9 +13,12 @@ accept automatic login from the client.
 """
 
 from optparse import OptionParser
+from urlparse import urlparse
 import subprocess
 import ConfigParser
 import logging
+import shutil
+import signal
 import sys
 import os
 
@@ -38,6 +41,12 @@ class InvalidConfigurationException(Exception):
     
   def __str__(self):
     return self.msg
+
+
+class TimeoutException(Exception):
+  """Subprocess timeout"""
+  def __init__(self):
+    super(TimeoutException, self).__init__()
     
 
 class ObjectWithLogger(object):
@@ -67,10 +76,14 @@ class SshAuth(ObjectWithLogger):
 
 class SystemCommand(ObjectWithLogger):
   """Run and manage subprocess"""
-  def __init__(self, cmd, dryrun=False):
+  TIMEOUT_MIN = 5
+
+  def __init__(self, cmd, dryrun=False, timeout=TIMEOUT_MIN):
     super(SystemCommand, self).__init__()
     self.cmd = cmd
     self.dryrun = dryrun
+    self.timeout = timeout
+
 
   def run(self):
     
@@ -83,8 +96,16 @@ class SystemCommand(ObjectWithLogger):
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
 
-    #TODO timeout maybe...
-    (stdout, stderr) = proc.communicate()
+    #Start timer to avoid infinite wait
+    signal.signal(signal.SIGALRM, timeoutHandler)
+    signal.alarm(self.TIMEOUT_MIN * 60)
+
+    try:
+      (stdout, stderr) = proc.communicate()
+      signal.alarm(0) #reset the alarm
+    except TimeoutException:
+      self.logger.error("Command timed out: %s" % self.cmd)
+      return False
 
     if proc.returncode != 0:
       #Command failed
@@ -98,6 +119,7 @@ class SystemCommand(ObjectWithLogger):
 class BaseRemoteCommand(ObjectWithLogger):
   """Abstract remote command, run command set with _setCmd()"""
   def __init__(self, sshAuth, dryrun, *args, **kwargs):
+    #TODO: timeout as arguments
     super(BaseRemoteCommand, self).__init__()
     self.sshAuth = sshAuth
     self.dryrun = dryrun
@@ -144,39 +166,71 @@ class SshCommand(BaseRemoteCommand):
 
 class ScpCopy(BaseRemoteCommand):
   """File transfer with remote host using scp"""
-  def __init__(self, sshAuth, ftSection, dryrun=False):
+  def __init__(self, sshAuth, srcPath, dstPath, dryrun=False):
     super(ScpCopy, self).__init__(sshAuth, dryrun)
-    self.ftSection = ftSection
+    self.srcPath = srcPath
+    self.dstPath = dstPath
+
+  def __str__(self):
+    if os.path.isdir(self.srcPath):
+      qual = 'Directory'
+    else:
+      qual = 'File'
+    return "%s %s to %s:%s" % (qual, self.srcPath, self.sshAuth, self.dstPath)
 
   def _setCmd(self):
     self._cmd = "scp "
 
     #If src is a directory add -r
-    if os.path.isdir(self.ftSection.srcPath):
+    if os.path.isdir(self.srcPath):
       self._cmd += "-r "
 
     #PrivateKey
     if self.sshAuth.privKey is not None:
       self._cmd += "-i %s " % self.sshAuth.privKey
 
-    self._cmd += "%s " % self.ftSection.srcPath
+    self._cmd += "%s " % self.srcPath
 
     #Dst
     self._cmd += "%s@%s:" % (self.sshAuth.userName, self.sshAuth.remoteHost)
-    self._cmd += "%s" % self.ftSection.remoteOutDir
+    self._cmd += "%s" % self.dstPath
 
 
 
 class SvnCheckout(ObjectWithLogger):
   """Checkout a subversion repo"""
-  def __init__(self, svnUrl, dryrun=False):
+  def __init__(self, workDir, svnUrl, coPath, dryrun=False):
     super(SvnCheckout, self).__init__()
+    self.workDir = workDir
     self.svnUrl = svnUrl
+    self.coPath = coPath
     self.dryrun = dryrun
+    self._cmd = "svn co %s %s" % (self.svnUrl, self.coPath)
 
   def run(self):
-    #TODO
-    pass
+    #TODO exception handling
+    retVal = True
+
+    cwd = os.getcwd()
+    os.chdir(self.workDir)
+
+    if os.path.exists(self.coPath) and not self.dryrun:
+      self.logger.info("Deleting %s for svn checkout of %s", 
+                       os.path.join(self.workDir, self.coPath),
+                       self.svnUrl)
+      shutil.rmtree(self.coPath)
+
+    subProc = SystemCommand(self._cmd, self.dryrun)
+    self.logger.info("Doing svn checkout of %s in %s/%s", self.svnUrl,
+                     self.workDir, self.coPath)
+
+    if not subProc.run():
+      self.logger.error("Failed to checkout %s", self.svnUrl)
+      retVal = False
+
+    os.chdir(cwd)
+
+    return retVal
     
 
     
@@ -188,8 +242,9 @@ class FTSection(object):
   OPT_REMOTE_OUTDIR = 'remoteOutDir'
   OPT_REMOTE_ERASE = 'eraseRemoteDst'
 
-  def __init__(self, srcPath, remoteHost, remoteOutDir, eraseRemoteDir):
+  def __init__(self, name, srcPath, remoteHost, remoteOutDir, eraseRemoteDir):
     super(FTSection, self).__init__()
+    self.name = name
     self.srcPath = srcPath
     self.remoteHostList= remoteHost.split()
     self.remoteOutDir = remoteOutDir
@@ -241,7 +296,8 @@ class FTConfig(ObjectWithLogger):
         continue
 
       self._sectionList.append(\
-        FTSection(self._parser.get(section, FTSection.OPT_SRC_PATH),
+        FTSection(section, 
+                  self._parser.get(section, FTSection.OPT_SRC_PATH),
                   self._parser.get(section, FTSection.OPT_REMOTE_HOST),
                   self._parser.get(section, FTSection.OPT_REMOTE_OUTDIR),
                   self._parser.getboolean(section, FTSection.OPT_REMOTE_ERASE)))
@@ -305,20 +361,30 @@ class FTConfig(ObjectWithLogger):
 
 class FileSync(ObjectWithLogger):
   """Sync files base on configuration file"""
+  #TODO: better error checking/reporting mainly in run()
+  #More logging
+
+  SVN_DIR = 'fsync-dir'
+
   def __init__(self, configFile, dryrun, testAuth, logFile):
     super(FileSync, self).__init__()
     self.configFile = configFile
     self.dryrun = dryrun
     self.testAuth = testAuth
     self.logFile = logFile
+    self.thisDir = os.path.dirname(os.path.abspath(__file__))
+    self.svnDir = os.path.join(self.thisDir, self.SVN_DIR)
     self._userLogin = None
     self._ftConfig = None
 
     
   def init(self):
     """Initialize all components required to operate"""
-    self._setCwd()
-    self._setUpLogging()
+    if not self._setDirectories():
+      return False
+
+    if not self._setUpLogging():
+      return False
 
     if not os.path.exists(self.configFile):
       self.logger.critical("Configuration file %s does not exist",
@@ -337,41 +403,79 @@ class FileSync(ObjectWithLogger):
     return True
 
 
+  def __del__(self):
+    """Destructor, make sure that temporary checkout directory is deleted"""
+    if os.path.exists(self.svnDir) and not self.dryrun:
+      shutil.rmtree(self.svnDir)
+
+
   def run(self):
-    """Execute"""
+    """Execute file syncing"""
 
     #Check if this is a authentication test
     if self.testAuth:
       return self._testAuth()
 
-    #TODO: Check if svn is needed
-    #might need to do a svn checkout
     for section in self._ftConfig.ftSections:
+
+      cpSrc = None
+      cpDst = section.remoteOutDir
+
+      #Check if section.srcPath is a svn url or a local path
+      if self._isSvnUrl(section.srcPath):
+        svnCo = SvnCheckout(self.svnDir, section.srcPath, 
+                            section.name, self.dryrun) 
+        if not svnCo.run():
+          continue
+
+        cpSrc = os.path.join(self.svnDir, section.name)
+
+      else:
+        cpSrc = section.srcPath
+
 
       for remoteHost in section.remoteHostList:
 
+        #Create sshAuth for this remoteHost
         sshAuth = SshAuth(self._userLogin, remoteHost, 
                           self._ftConfig.privKey)
 
+        #Check if remote directory must be erased
         if section.eraseRemoteDir:
           self._eraseRemoteDir(sshAuth, section)
 
-        fCopy = ScpCopy(sshAuth, section,self.dryrun)
-        fCopy.run()
+        fCopy = ScpCopy(sshAuth, cpSrc, cpDst, self.dryrun)
+        self.logger.info("Copying : %s", fCopy)
+        if not fCopy.run():
+          self.logger.error("Failed to copy : %s", fCopy)
 
     return True
+
+
+  def _isSvnUrl(self, path):
+    """Return true if path argument is a svn or http url"""
+    parseResult = urlparse(path)
+
+    if parseResult.scheme == 'svn' or parseResult.scheme == 'http':
+      return True
+    else:
+      return False
+
 
   def _eraseRemoteDir(self, sshAuth, ftSection):
     """Delete a directory on remote host.
        Remote directory is composed of the last part of the srcPath appended
        to remoteOutDir"""
 
-    #Remove trailing / if any
-    srcDir = ftSection.srcPath.rstrip('/')
-    #Retrieve last part of srcPath
-    srcDirName = os.path.basename(srcDir)
+    if self._isSvnUrl(ftSection.srcPath):
+      remoteDir = os.path.join(ftSection.remoteOutDir, ftSection.name)
+    else:
+      #Remove trailing / if any
+      srcDir = ftSection.srcPath.rstrip('/')
+      #Retrieve last part of srcPath
+      srcDirName = os.path.basename(srcDir)
 
-    remoteDir = os.path.join(ftSection.remoteOutDir, srcDirName)
+      remoteDir = os.path.join(ftSection.remoteOutDir, srcDirName)
 
     self.logger.info("Erasing directory %s on remote host %s", remoteDir,
                      sshAuth)
@@ -382,10 +486,25 @@ class FileSync(ObjectWithLogger):
     return sshCmd.run()
 
 
-  def _setCwd(self):
-    """Set current directory to the same as this file"""
-    thisScriptDir = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(thisScriptDir)
+  def _setDirectories(self):
+    """Set current directory to the same as this file and create working dir"""
+    try:
+      os.chdir(self.thisDir)
+    except OSError:
+      self.logger.critical("Failed to change current directory to %s",
+                           self.thisDir)
+      return False
+
+    if not os.path.exists(self.svnDir):
+      try:
+        os.mkdir(self.svnDir)
+      except OSError:
+        self.logger.critical("Failed to create directory %s", self.svnDir)
+        return False
+
+
+    return True
+
 
   def _setUpLogging(self):
     """Configure logging"""
@@ -406,6 +525,8 @@ class FileSync(ObjectWithLogger):
       fileHandler = logging.FileHandler(self.logFile, mode='w')
       fileHandler.setFormatter(formatter)
       rootLogger.addHandler(fileHandler)
+
+    return True
 
 
   def _testAuth(self):
@@ -430,6 +551,9 @@ class FileSync(ObjectWithLogger):
                           sshAuth, self._ftConfig.privKey)
 
     
+def timeoutHandler(signum, frame):
+  """Called on subprocess timeout"""
+  raise TimeoutException()
 
 
 def main():
