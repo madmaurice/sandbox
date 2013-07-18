@@ -7,7 +7,6 @@
 #include "dxApp.h"
 #include "config.h"
 #include <d3dcompiler.h>
-#include <array>
 
 namespace
 {
@@ -186,6 +185,8 @@ bool InitDX::Init()
      	{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
  
+    // Create the input layout to describe the input-buffer data for the input-assembler stage.
+    // This map our vertex structure to the corresponding input of the vertex shader
     m_dxDevice->CreateInputLayout(vertexDesc, 2, pVSBlob->GetBufferPointer(),
         pVSBlob->GetBufferSize(), m_inputLayout.GetAddressOf());
 

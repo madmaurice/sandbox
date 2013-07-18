@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{65482E88-38C9-4D39-ACDE-2DD38474FA6B}</ProjectGuid>
-    <RootNamespace>D3D</RootNamespace>
+    <ProjectGuid>{DD78BC90-A4E3-4D4F-BFCC-D00D98FD230F}</ProjectGuid>
+    <RootNamespace>box</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -33,11 +33,11 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="D3D.props" />
+    <Import Project="..\_build\D3D\D3D.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="D3DRel.props" />
+    <Import Project="..\_build\D3D\D3DRel.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -46,7 +46,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -67,22 +67,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\common\dxApp.cpp" />
-    <ClCompile Include="..\..\common\timer.cpp" />
-    <ClCompile Include="..\..\init\init.cpp" />
+    <ClInclude Include="..\common\comPtr.h" />
+    <ClInclude Include="..\common\config.h" />
+    <ClInclude Include="..\common\dxApp.h" />
+    <ClInclude Include="..\common\dxUtil.h" />
+    <ClInclude Include="..\common\mathHelper.h" />
+    <ClInclude Include="..\common\timer.h" />
+    <ClInclude Include="..\common\types.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\common\comPtr.h" />
-    <ClInclude Include="..\..\common\config.h" />
-    <ClInclude Include="..\..\common\dxApp.h" />
-    <ClInclude Include="..\..\common\dxUtil.h" />
-    <ClInclude Include="..\..\common\timer.h" />
-    <ClInclude Include="..\..\common\types.h" />
+    <ClCompile Include="..\common\dxApp.cpp" />
+    <ClCompile Include="..\common\mathHelper.cpp" />
+    <ClCompile Include="..\common\timer.cpp" />
+    <ClCompile Include="Box.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="shader.fx">
-      <FileType>Document</FileType>
-    </CustomBuild>
+    <FxCompile Include="color.fx">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">VS</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">VS</EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
