@@ -43,8 +43,8 @@ private:
     ComPtr<ID3D11Buffer>           m_indexBuffer;
 
     ComPtr<ID3DX11Effect> m_fx;
-	ID3DX11EffectTechnique* m_tech; //Not a COM object
-	ID3DX11EffectMatrixVariable* m_fxWorldViewProj; //Not a COM object
+	ID3DX11EffectTechnique* m_tech; //Not a COM object (come from Effects11 framework)
+	ID3DX11EffectMatrixVariable* m_fxWorldViewProj; //Not a COM object (come from Effects11 framework)
 
     ComPtr<ID3D11InputLayout>      m_inputLayout;
 

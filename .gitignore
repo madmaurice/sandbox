@@ -46,6 +46,10 @@ build/
 *.log
 *.scc
 
+# Shader
+*.fxo
+*.cod
+
 # Visual C++ cache files
 ipch/
 *.aps
