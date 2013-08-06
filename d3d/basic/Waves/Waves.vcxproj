@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{DD78BC90-A4E3-4D4F-BFCC-D00D98FD230F}</ProjectGuid>
-    <RootNamespace>box</RootNamespace>
+    <ProjectGuid>{18DE9678-3349-4C22-B3C1-12C6F00DDB96}</ProjectGuid>
+    <RootNamespace>Waves</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -33,11 +33,11 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\_build\D3D\D3D.props" />
+    <Import Project="..\..\_build\D3D\D3D.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\_build\D3D\D3DRel.props" />
+    <Import Project="..\..\_build\D3D\D3DRel.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -46,7 +46,6 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -67,27 +66,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\common\comPtr.h" />
-    <ClInclude Include="..\common\config.h" />
-    <ClInclude Include="..\common\dxApp.h" />
-    <ClInclude Include="..\common\dxUtil.h" />
-    <ClInclude Include="..\common\mathHelper.h" />
-    <ClInclude Include="..\common\timer.h" />
-    <ClInclude Include="..\common\types.h" />
+    <ClInclude Include="..\..\common\comPtr.h" />
+    <ClInclude Include="..\..\common\config.h" />
+    <ClInclude Include="..\..\common\demoApp.h" />
+    <ClInclude Include="..\..\common\dxApp.h" />
+    <ClInclude Include="..\..\common\dxUtil.h" />
+    <ClInclude Include="..\..\common\geometryGenerator.h" />
+    <ClInclude Include="..\..\common\mathHelper.h" />
+    <ClInclude Include="..\..\common\timer.h" />
+    <ClInclude Include="..\..\common\types.h" />
+    <ClInclude Include="..\..\common\waves.h" />
+    <ClInclude Include="waves.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\dxApp.cpp" />
-    <ClCompile Include="..\common\mathHelper.cpp" />
-    <ClCompile Include="..\common\timer.cpp" />
-    <ClCompile Include="Box.cpp" />
+    <ClCompile Include="..\..\common\demoApp.cpp" />
+    <ClCompile Include="..\..\common\dxApp.cpp" />
+    <ClCompile Include="..\..\common\geometryGenerator.cpp" />
+    <ClCompile Include="..\..\common\mathHelper.cpp" />
+    <ClCompile Include="..\..\common\timer.cpp" />
+    <ClCompile Include="..\..\common\waves.cpp" />
+    <ClCompile Include="waves.cpp" />
+    <ClCompile Include="WavesDemo.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="color.fx">
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">VS</EntryPointName>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">VS</EntryPointName>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
-    </FxCompile>
+    <FxCompile Include="FX\color.fx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

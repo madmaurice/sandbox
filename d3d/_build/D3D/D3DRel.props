@@ -5,14 +5,21 @@
   <PropertyGroup>
     <ExecutablePath>$(DXSDK_DIR)\Utilities\bin\x86;$(ExecutablePath)</ExecutablePath>
     <LibraryPath>$(DXSDK_DIR)\Lib\x86;D:\code\cpp\sandbox\d3d\Effects11\bin;$(LibraryPath)</LibraryPath>
+    <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalDependencies>d3d11.lib;d3dx11.lib;D3DCompiler.lib;dxerr.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;d3dx11.lib;D3DCompiler.lib;dxerr.lib;Effects11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>$(DXSDK_DIR)\Include;$(SolutionDir)\..\..\common;$(SolutionDir)\..\..\Effects11\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <FxCompile>
+      <ObjectFileOutput>%(RelativeDir)\%(Filename).fxo</ObjectFileOutput>
+      <EntryPointName />
+      <ShaderType>Effect</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

@@ -28,6 +28,9 @@ protected:
     XMFLOAT4X4 m_view;
 	XMFLOAT4X4 m_proj;
 
+    XMFLOAT3 m_camPosition;
+    XMFLOAT3 m_camTarget;
+
     float m_theta;
 	float m_phi;
 	float m_radius;

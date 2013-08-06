@@ -16,7 +16,7 @@
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF ); \
     _CrtSetReportMode( _CRT_ASSERT, _CRTDBG_MODE_DEBUG | _CRTDBG_MODE_WNDW);
 #else
-#define OC_DBG_CONFIG
+#define OC_DBG_CONFIG()
 #endif
 
 #endif // _INCGUARD_CONFIG_H

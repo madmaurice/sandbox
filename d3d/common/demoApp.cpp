@@ -4,6 +4,8 @@
 
 DemoApp::DemoApp(HINSTANCE hInstance)
 : DXApp(hInstance) 
+, m_camPosition(0.0f, 0.0f, 0.0f)
+, m_camTarget(0.0f, 0.0f, 0.0f)
 , m_theta(1.5f*MathHelper::Pi)
 , m_phi(0.25f*MathHelper::Pi)
 , m_radius(5.0f)
@@ -54,9 +56,8 @@ void DemoApp::UpdateScene(float dt)
 	XMVECTOR target = XMVectorZero();
 	XMVECTOR up     = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
-    std::stringstream sstream;
-    sstream << m_theta << std::endl; 
-    OutputDebugString(sstream.str().c_str());
+    XMStoreFloat3(&m_camPosition, pos);
+    XMStoreFloat3(&m_camTarget, target);
 
 	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
 	XMStoreFloat4x4(&m_view, view);

@@ -10,7 +10,7 @@
 #include "dxUtil.h"
 #include "timer.h"
 #include <string>
-#include <comPtr.h>
+#include "comPtr.h"
 
 class DXApp
 {

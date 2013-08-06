@@ -11,7 +11,7 @@
 #include <xnamath.h>
 #include <dxerr.h>
 
-#if defined(DEBUG) | defined(_DEBUG)
+#if defined(DEBUG) || defined(_DEBUG)
 	#ifndef HR
 	#define HR(x)                                              \
 	{                                                          \

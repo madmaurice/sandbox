@@ -50,8 +50,6 @@ private:
     uint32 m_gridIndexCount;
 
     XMFLOAT4X4 m_world;
-
-	POINT m_lastMousePos;
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
@@ -82,9 +80,6 @@ HillApp::HillApp(HINSTANCE hInstance)
     m_windowCaption = "Hill Demo";
 
     m_radius = 200.0f;
-
-	m_lastMousePos.x = 0;
-	m_lastMousePos.y = 0;
 
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&m_world, I);
