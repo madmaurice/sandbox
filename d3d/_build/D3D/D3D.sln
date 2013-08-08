@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Waves", "..\..\basic\Waves\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lighting", "..\..\basic\Lighting\Lighting.vcxproj", "{96700A58-FE6F-4552-A99D-F4FA45C61095}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LitSkull", "..\..\basic\LitSkull\LitSkull.vcxproj", "{01BE75AE-3F5C-428D-B78A-8B74AA645A05}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -43,6 +45,10 @@ Global
 		{96700A58-FE6F-4552-A99D-F4FA45C61095}.Debug|Win32.Build.0 = Debug|Win32
 		{96700A58-FE6F-4552-A99D-F4FA45C61095}.Release|Win32.ActiveCfg = Release|Win32
 		{96700A58-FE6F-4552-A99D-F4FA45C61095}.Release|Win32.Build.0 = Release|Win32
+		{01BE75AE-3F5C-428D-B78A-8B74AA645A05}.Debug|Win32.ActiveCfg = Debug|Win32
+		{01BE75AE-3F5C-428D-B78A-8B74AA645A05}.Debug|Win32.Build.0 = Debug|Win32
+		{01BE75AE-3F5C-428D-B78A-8B74AA645A05}.Release|Win32.ActiveCfg = Release|Win32
+		{01BE75AE-3F5C-428D-B78A-8B74AA645A05}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

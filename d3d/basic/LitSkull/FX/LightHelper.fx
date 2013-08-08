@@ -4,13 +4,6 @@
 // Structures and functions for lighting calculations.
 //***************************************************************************************
 
-
-/*
-Structure packing
-- Elements are packed into 4D vectors
-- A single elements cannot be split across 2 4D vectors
-*/
-
 struct DirectionalLight
 {
 	float4 Ambient;
@@ -57,26 +50,6 @@ struct Material
 	float4 Reflect;
 };
 
-/*
-
-Basic Light equation : LitColor = A + kd*D + ks*S     (D = diffuse equation, S = specular)
--> Parallel light (directional) is exactly this equation
--> Point light (lightbulb) add a division (attenuation) that apply to kd*D + ks*S and a range parameter (no light if distance > range)
--> Spot light (flashlight) same as point light but multiplied by the spotlight factor (kspot) to scale the light intensity based
-on where the point is with respect to the spotlight cone : kspot = max(-L dot d, 0)^s (d is spotlight direction, s control the width of the cone)
-
-L = light vector
-n = surface normal
-
-kd : max (L dot n, 0)
-ks: max(v dot r, 0)^p si L dot n > 0 ou sinon ks = 0
-
-A = la * ma (component wise multiplication i.e. modulation) (la = ambient light color, ma = material light color)
-D = ld * md (ld = diffuse light color, md = diffuse material color)
-S = ls * ms
-
-*/
-
 //---------------------------------------------------------------------------------------
 // Computes the ambient, diffuse, and specular terms in the lighting equation
 // from a directional light.  We need to output the terms separately because
@@ -102,43 +75,14 @@ void ComputeDirectionalLight(Material mat, DirectionalLight L,
 	// Add diffuse and specular term, provided the surface is in 
 	// the line of site of the light.
 	
-	float diffuseFactor = dot(lightVec, normal); //kd
-
-	[flatten]
-    if ( diffuseFactor <= 0.0f)
-    {
-        diffuseFactor = 0.4f;
-    }
-    else if (diffuseFactor > 0.0f && diffuseFactor < 0.5)
-    {
-        diffuseFactor = 0.6f;
-    }
-    else
-    {
-        diffuseFactor = 1.0f;
-    }
+	float diffuseFactor = dot(lightVec, normal);
 
 	// Flatten to avoid dynamic branching.
 	[flatten]
 	if( diffuseFactor > 0.0f )
 	{
-        //Calculate Specular reflect vector (reflection of light ray which is the center of the cone of reflection)
-		float3 r         = reflect(-lightVec, normal); 
-		float specFactor = pow(max(dot(toEye, r), 0.0f), mat.Specular.w); //ks
-
-        [flatten]
-        if ( specFactor <= 0.0f)
-        {
-            specFactor = 0.4f;
-        }
-        else if (specFactor > 0.0f && specFactor < 0.5)
-        {
-            specFactor = 0.6f;
-        }
-        else
-        {
-            specFactor = 1.0f;
-        }
+		float3 v         = reflect(-lightVec, normal);
+		float specFactor = pow(max(dot(v, toEye), 0.0f), mat.Specular.w);
 					
 		diffuse = diffuseFactor * mat.Diffuse * L.Diffuse;
 		spec    = specFactor * mat.Specular * L.Specular;
@@ -179,47 +123,19 @@ void ComputePointLight(Material mat, PointLight L, float3 pos, float3 normal, fl
 
 	float diffuseFactor = dot(lightVec, normal);
 
-    [flatten]
-    if ( diffuseFactor <= 0.0f)
-    {
-        diffuseFactor = 0.4f;
-    }
-    else if (diffuseFactor > 0.0f && diffuseFactor < 0.5)
-    {
-        diffuseFactor = 0.6f;
-    }
-    else
-    {
-        diffuseFactor = 1.0f;
-    }
-
 	// Flatten to avoid dynamic branching.
 	[flatten]
 	if( diffuseFactor > 0.0f )
 	{
-		float3 r         = reflect(-lightVec, normal);
-		float specFactor = pow(max(dot(toEye, r), 0.0f), mat.Specular.w);
-
-        [flatten]
-        if ( specFactor <= 0.0f)
-        {
-            specFactor = 0.4f;
-        }
-        else if (specFactor > 0.0f && specFactor < 0.5)
-        {
-            specFactor = 0.6f;
-        }
-        else
-        {
-            specFactor = 1.0f;
-        }
+		float3 v         = reflect(-lightVec, normal);
+		float specFactor = pow(max(dot(v, toEye), 0.0f), mat.Specular.w);
 					
 		diffuse = diffuseFactor * mat.Diffuse * L.Diffuse;
 		spec    = specFactor * mat.Specular * L.Specular;
 	}
 
 	// Attenuate
-	float att = 1.0f / dot(L.Att, float3(1.0f, d, d*d)); //equivalent to : a0 + a1*d + a2*d^2
+	float att = 1.0f / dot(L.Att, float3(1.0f, d, d*d));
 
 	diffuse *= att;
 	spec    *= att;
@@ -259,47 +175,19 @@ void ComputeSpotLight(Material mat, SpotLight L, float3 pos, float3 normal, floa
 
 	float diffuseFactor = dot(lightVec, normal);
 
-    [flatten]
-    if ( diffuseFactor <= 0.0f)
-    {
-        diffuseFactor = 0.4f;
-    }
-    else if (diffuseFactor > 0.0f && diffuseFactor < 0.5)
-    {
-        diffuseFactor = 0.6f;
-    }
-    else
-    {
-        diffuseFactor = 1.0f;
-    }
-
 	// Flatten to avoid dynamic branching.
 	[flatten]
 	if( diffuseFactor > 0.0f )
 	{
-		float3 r         = reflect(-lightVec, normal);
-		float specFactor = pow(max(dot(toEye, r), 0.0f), mat.Specular.w);
-
-        [flatten]
-        if ( specFactor <= 0.0f)
-        {
-            specFactor = 0.4f;
-        }
-        else if (specFactor > 0.0f && specFactor < 0.5)
-        {
-            specFactor = 0.6f;
-        }
-        else
-        {
-            specFactor = 1.0f;
-        }
+		float3 v         = reflect(-lightVec, normal);
+		float specFactor = pow(max(dot(v, toEye), 0.0f), mat.Specular.w);
 					
 		diffuse = diffuseFactor * mat.Diffuse * L.Diffuse;
 		spec    = specFactor * mat.Specular * L.Specular;
 	}
 	
 	// Scale by spotlight factor and attenuate.
-	float spot = pow(max(dot(-lightVec, L.Direction), 0.0f), L.Spot); //L.Spot = s (cone width)
+	float spot = pow(max(dot(-lightVec, L.Direction), 0.0f), L.Spot);
 
 	// Scale by spotlight factor and attenuate.
 	float att = spot / dot(L.Att, float3(1.0f, d, d*d));

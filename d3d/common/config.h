@@ -7,6 +7,13 @@
 
 #if defined(DEBUG) || defined(_DEBUG)
 #define _CRTDBG_MAP_ALLOC
+
+// Uncomment this if needed (on memory leak)
+#if 0
+#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_NEW
+#endif 
+
 #include <crtdbg.h>
 
 // Enable run-time memory check for debug builds.

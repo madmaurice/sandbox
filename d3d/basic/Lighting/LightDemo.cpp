@@ -123,7 +123,7 @@ LightDemo::LightDemo(HINSTANCE hInstance)
 	XMStoreFloat4x4(&m_wavesWorld, wavesOffset);
 
     // Directional light.
-	m_dirLight.ambient  = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	m_dirLight.ambient  = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f); //Light intensity
 	m_dirLight.diffuse  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	m_dirLight.specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	m_dirLight.direction = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
@@ -143,7 +143,7 @@ LightDemo::LightDemo(HINSTANCE hInstance)
 	m_spotLight.spot     = 96.0f;
 	m_spotLight.range    = 10000.0f;
 
-	m_landMat.ambient  = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
+	m_landMat.ambient  = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f); //Light reflection
 	m_landMat.diffuse  = XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f);
 	m_landMat.specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
 
