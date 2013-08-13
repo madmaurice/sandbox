@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lighting", "..\..\basic\Lig
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LitSkull", "..\..\basic\LitSkull\LitSkull.vcxproj", "{01BE75AE-3F5C-428D-B78A-8B74AA645A05}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Crate", "..\..\basic\Crate\Crate.vcxproj", "{2CC3078C-630F-4B2A-A0CE-1F0B947B1677}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -49,6 +51,10 @@ Global
 		{01BE75AE-3F5C-428D-B78A-8B74AA645A05}.Debug|Win32.Build.0 = Debug|Win32
 		{01BE75AE-3F5C-428D-B78A-8B74AA645A05}.Release|Win32.ActiveCfg = Release|Win32
 		{01BE75AE-3F5C-428D-B78A-8B74AA645A05}.Release|Win32.Build.0 = Release|Win32
+		{2CC3078C-630F-4B2A-A0CE-1F0B947B1677}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2CC3078C-630F-4B2A-A0CE-1F0B947B1677}.Debug|Win32.Build.0 = Debug|Win32
+		{2CC3078C-630F-4B2A-A0CE-1F0B947B1677}.Release|Win32.ActiveCfg = Release|Win32
+		{2CC3078C-630F-4B2A-A0CE-1F0B947B1677}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -6,7 +6,9 @@
 #define OC_ASSERT(x) _ASSERTE(x)
 
 #if defined(DEBUG) || defined(_DEBUG)
-#define _CRTDBG_MAP_ALLOC
+
+//#define _CRTDBG_MAP_ALLOC
+//#include <crtdbg.h>
 
 // Uncomment this if needed (on memory leak)
 #if 0
@@ -14,7 +16,6 @@
 #define new DEBUG_NEW
 #endif 
 
-#include <crtdbg.h>
 
 // Enable run-time memory check for debug builds.
 // And configure assert report
