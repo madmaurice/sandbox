@@ -51,7 +51,7 @@ void DemoApp::OnResize()
 
 void DemoApp::UpdateScene(float dt)
 {
-    Sleep(16.667);
+    Sleep(16);
 
 	// Build the view matrix.
     XMVECTOR pos    = MathHelper::ConvertSphericalToCartesian(m_radius, m_theta, m_phi);
