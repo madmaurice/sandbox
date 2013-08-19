@@ -1,8 +1,13 @@
 //---------------------------------------------------------------------------------------
 //
-// Draw Waves demo with lighting + texture
+// Draw Waves demo with blending
 //
 //---------------------------------------------------------------------------------------
+
+#if defined(DEBUG) || defined(_DEBUG)
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#endif
 
 #include "demoApp.h"
 #include "config.h"
@@ -12,6 +17,7 @@
 #include "lightHelper.h"
 #include "waves.h"
 #include "effects.h"
+#include "renderStates.h"
 #include "vertex.h"
 #include <d3dcompiler.h>
 #include <iostream>
@@ -19,11 +25,18 @@
 #include <fstream>
 #include <vector>
 
-class TexturedWavesApp : public DemoApp
+enum RenderOptions
+{
+	Lighting = 0,
+	Textures = 1,
+	TexturesAndFog = 2
+};
+
+class BlendWavesApp : public DemoApp
 {
 public:
-	explicit TexturedWavesApp(HINSTANCE hInstance);
-	~TexturedWavesApp();
+	explicit BlendWavesApp(HINSTANCE hInstance);
+	~BlendWavesApp();
 
 	virtual bool Init();
 	virtual void UpdateScene(float dt);
@@ -35,6 +48,7 @@ private:
 	virtual void InitFX();
 	virtual void InitVertexLayout();
 
+	void BuildCrateBuffers();
     void BuildLandBuffers();
 	void BuildWavesBuffers();
 
@@ -45,14 +59,18 @@ private:
     ComPtr<ID3D11Buffer>           m_landIB;
     ComPtr<ID3D11Buffer>           m_wavesVB;
     ComPtr<ID3D11Buffer>           m_wavesIB;
+    ComPtr<ID3D11Buffer>           m_boxVB;
+    ComPtr<ID3D11Buffer>           m_boxIB;
 
 	ComPtr<ID3D11ShaderResourceView> m_grassMapSRV;
 	ComPtr<ID3D11ShaderResourceView> m_wavesMapSRV;
+	ComPtr<ID3D11ShaderResourceView> m_boxMapSRV;
 
 	Waves m_waves;
 
 	Material m_landMat;
 	Material m_wavesMat;
+	Material m_boxMat;
 
     DirectionalLight m_dirLight[3];
 
@@ -63,10 +81,13 @@ private:
     // Define transformations from local spaces to world space.
     XMFLOAT4X4 m_landWorld;
 	XMFLOAT4X4 m_wavesWorld;
+	XMFLOAT4X4 m_boxWorld;
 
 	uint32 m_landIndexCount;
 
 	XMFLOAT2 m_waterTexOffset;
+
+    RenderOptions m_renderOptions;
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
@@ -75,7 +96,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
     //Configure debugging stuff
     OC_DBG_CONFIG();
 
-	TexturedWavesApp theApp(hInstance);
+	BlendWavesApp theApp(hInstance);
 	
 	if(!theApp.Init())
 		return 0;
@@ -83,26 +104,34 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	return theApp.Run();
 }
 
-TexturedWavesApp::TexturedWavesApp(HINSTANCE hInstance)
+BlendWavesApp::BlendWavesApp(HINSTANCE hInstance)
 : DemoApp(hInstance) 
 , m_landVB(nullptr)
 , m_landIB(nullptr)
 , m_wavesVB(nullptr)
 , m_wavesIB(nullptr)
+, m_boxVB(nullptr)
+, m_boxIB(nullptr)
 , m_grassMapSRV(nullptr)
 , m_wavesMapSRV(nullptr)
+, m_boxMapSRV(nullptr)
 , m_landIndexCount(0)
 , m_waterTexOffset(0.0f, 0.0f)
+, m_renderOptions(RenderOptions::TexturesAndFog)
 {
-    m_windowCaption = "TexturedWaves Demo";
+    m_windowCaption = "Blend Demo";
 
-    m_radius = 200.0f;
+    m_radius = 80.0f;
 
 	XMMATRIX I = XMMatrixIdentity();
     XMStoreFloat4x4(&m_landWorld, I);
     XMStoreFloat4x4(&m_wavesWorld, I);
 	XMStoreFloat4x4(&m_view, I);
 	XMStoreFloat4x4(&m_proj, I);
+
+    XMMATRIX boxScale = XMMatrixScaling(15.0f, 15.0f, 15.0f);
+	XMMATRIX boxOffset = XMMatrixTranslation(8.0f, 5.0f, -15.0f);
+	XMStoreFloat4x4(&m_boxWorld, boxScale*boxOffset);
 
     // Scale the grass texture 5 times (wrap)
     XMMATRIX grassTexScale = XMMatrixScaling(5.0f, 5.0f, 0.0f);
@@ -125,22 +154,26 @@ TexturedWavesApp::TexturedWavesApp(HINSTANCE hInstance)
 	m_dirLight[2].direction = XMFLOAT3(0.0f, -0.707f, -0.707f);
 
 	m_landMat.ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-    //Diffuse component is white and it's merged with the texture (diffuse map, albedo..)
 	m_landMat.diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	m_landMat.specular = XMFLOAT4(0.2f, 0.2f, 0.2f, 16.0f);
 
 	m_wavesMat.ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	m_wavesMat.diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_wavesMat.diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.5f);
 	m_wavesMat.specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 32.0f);
+
+	m_boxMat.ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	m_boxMat.diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_boxMat.specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 16.0f);
 }
 
-TexturedWavesApp::~TexturedWavesApp()
+BlendWavesApp::~BlendWavesApp()
 {
     Effects::DestroyAll();
 	InputLayouts::DestroyAll();
+	RenderStates::DestroyAll();
 }
 
-bool TexturedWavesApp::Init()
+bool BlendWavesApp::Init()
 {
     m_waves.Init(160, 160, 1.0f, 0.03f, 3.25f, 0.4f);
 
@@ -150,13 +183,54 @@ bool TexturedWavesApp::Init()
 	return true;
 }
 
-void TexturedWavesApp::InitGeometryBuffers()
+void BlendWavesApp::InitGeometryBuffers()
 {
+    BuildCrateBuffers();
     BuildLandBuffers();
     BuildWavesBuffers();
 }
 
-void TexturedWavesApp::BuildLandBuffers()
+void BlendWavesApp::BuildCrateBuffers()
+{
+    GeometryGenerator::MeshData box;
+
+	GeometryGenerator geoGen;
+	geoGen.CreateBox(1.0f, 1.0f, 1.0f, box);
+
+	// Extract the vertex elements we are interested in and pack the
+	// vertices of all the meshes into one vertex buffer.
+	std::vector<Vertex::Basic32> vertices(box.vertices.size());
+
+	for(UINT i = 0; i < box.vertices.size(); ++i)
+	{
+		vertices[i].Pos    = box.vertices[i].position;
+		vertices[i].Normal = box.vertices[i].normal;
+		vertices[i].Tex    = box.vertices[i].texC;
+	}
+
+    D3D11_BUFFER_DESC vbd;
+    vbd.Usage = D3D11_USAGE_IMMUTABLE;
+    vbd.ByteWidth = sizeof(Vertex::Basic32) * box.vertices.size();
+    vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    vbd.CPUAccessFlags = 0;
+    vbd.MiscFlags = 0;
+    D3D11_SUBRESOURCE_DATA vinitData;
+    vinitData.pSysMem = &vertices[0];
+    HR(m_dxDevice->CreateBuffer(&vbd, &vinitData, m_boxVB.GetAddressOf()));
+
+	// Pack the indices of all the meshes into one index buffer.
+	D3D11_BUFFER_DESC ibd;
+    ibd.Usage = D3D11_USAGE_IMMUTABLE;
+	ibd.ByteWidth = sizeof(UINT) * box.indices.size();
+    ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    ibd.CPUAccessFlags = 0;
+    ibd.MiscFlags = 0;
+    D3D11_SUBRESOURCE_DATA iinitData;
+    iinitData.pSysMem = &box.indices[0];
+    HR(m_dxDevice->CreateBuffer(&ibd, &iinitData, m_boxIB.GetAddressOf()));
+}
+
+void BlendWavesApp::BuildLandBuffers()
 {
    	GeometryGenerator::MeshData land;
 	GeometryGenerator geoGen;
@@ -202,7 +276,7 @@ void TexturedWavesApp::BuildLandBuffers()
     HR(m_dxDevice->CreateBuffer(&ibd, &iinitData, m_landIB.GetAddressOf()));
 }
 
-void TexturedWavesApp::BuildWavesBuffers()
+void BlendWavesApp::BuildWavesBuffers()
 {
     // Create the vertex buffer.  Note that we allocate space only, as
 	// we will be updating the data every time step of the simulation.
@@ -251,12 +325,12 @@ void TexturedWavesApp::BuildWavesBuffers()
     HR(m_dxDevice->CreateBuffer(&ibd, &iinitData, m_wavesIB.GetAddressOf()));
 }
 
-float TexturedWavesApp::GetHeight(float x, float z)const
+float BlendWavesApp::GetHeight(float x, float z)const
 {
 	return 0.3f*( z*sinf(0.1f*x) + x*cosf(0.1f*z) );
 }
 
-XMFLOAT3 TexturedWavesApp::GetHillNormal(float x, float z)const
+XMFLOAT3 BlendWavesApp::GetHillNormal(float x, float z)const
 {
 	// n = (-df/dx, 1, -df/dz)
 	XMFLOAT3 n(
@@ -270,37 +344,41 @@ XMFLOAT3 TexturedWavesApp::GetHillNormal(float x, float z)const
 	return n;
 }
 
-void TexturedWavesApp::InitFX()
+void BlendWavesApp::InitFX()
 {
     // Must init Effects first since InputLayouts depend on shader signatures.
 	Effects::InitAll(m_dxDevice.Get());
 	InputLayouts::InitAll(m_dxDevice.Get());
+	RenderStates::InitAll(m_dxDevice.Get());
 
 	HR(D3DX11CreateShaderResourceViewFromFile(m_dxDevice.Get(), 
         "Textures/grass.dds", 0, 0, m_grassMapSRV.GetAddressOf(), 0 ));
 
     HR(D3DX11CreateShaderResourceViewFromFile(m_dxDevice.Get(), 
         "Textures/water2.dds", 0, 0, m_wavesMapSRV.GetAddressOf(), 0 ));
+
+    HR(D3DX11CreateShaderResourceViewFromFile(m_dxDevice.Get(), 
+        "Textures/WireFence.dds", 0, 0, m_boxMapSRV.GetAddressOf(), 0 ));
 }
 
-void TexturedWavesApp::InitVertexLayout()
+void BlendWavesApp::InitVertexLayout()
 {
 }
 
-void TexturedWavesApp::UpdateScene(float dt)
+void BlendWavesApp::UpdateScene(float dt)
 {
     DemoApp::UpdateScene(dt);
 
 	// Every quarter second, generate a random wave.
 	static float t_base = 0.0f;
-	if( (m_timer.TotalTime() - t_base) >= 0.25f )
+	if( (m_timer.TotalTime() - t_base) >= 0.1f )
 	{
-		t_base += 0.25f;
+		t_base += 0.1f;
  
 		uint32 i = 5 + rand() % (m_waves.RowCount()-10);
 		uint32 j = 5 + rand() % (m_waves.ColumnCount()-10);
 
-		float r = MathHelper::RandF(1.0f, 2.0f);
+		float r = MathHelper::RandF(0.5f, 1.0f);
 
 		m_waves.Disturb(i, j, r);
 	}
@@ -337,15 +415,27 @@ void TexturedWavesApp::UpdateScene(float dt)
 
 	// Combine scale and translation.
 	XMStoreFloat4x4(&m_waterTexTransform, wavesScale*wavesOffset);
+
+	// Switch the render mode based in key input.
+	if( GetAsyncKeyState('1') & 0x8000 )
+        m_renderOptions = RenderOptions::Lighting; 
+
+	if( GetAsyncKeyState('2') & 0x8000 )
+		m_renderOptions = RenderOptions::Textures; 
+
+	if( GetAsyncKeyState('3') & 0x8000 )
+		m_renderOptions = RenderOptions::TexturesAndFog; 
 }
 
-void TexturedWavesApp::DrawScene()
+void BlendWavesApp::DrawScene()
 {
-    m_dxImmediateContext->ClearRenderTargetView(m_renderTargetView.Get(), reinterpret_cast<const float*>(&oc::Colors::LightSteelBlue));
+    m_dxImmediateContext->ClearRenderTargetView(m_renderTargetView.Get(), reinterpret_cast<const float*>(&oc::Colors::Silver));
     m_dxImmediateContext->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 
     m_dxImmediateContext->IASetInputLayout(InputLayouts::Basic32.Get());
     m_dxImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    float blendFactor[] = {0.0f, 0.0f, 0.0f, 0.0f};
 
 	uint32 stride = sizeof(Vertex::Basic32);
     uint32 offset = 0;
@@ -358,10 +448,60 @@ void TexturedWavesApp::DrawScene()
     // Set per frame constants.
     Effects::BasicFX->SetDirLights(m_dirLight);
     Effects::BasicFX->SetEyePosW(m_camPosition);
+   	Effects::BasicFX->SetFogColor(oc::Colors::Silver);
+	Effects::BasicFX->SetFogStart(25.0f);
+	Effects::BasicFX->SetFogRange(200.0f);
+
+   	ID3DX11EffectTechnique* boxTech = nullptr;
+    ID3DX11EffectTechnique* landAndWavesTech = nullptr;
+
+    switch(m_renderOptions)
+	{
+	case RenderOptions::Lighting:
+		boxTech = Effects::BasicFX->Light3Tech;
+		landAndWavesTech = Effects::BasicFX->Light3Tech;
+		break;
+	case RenderOptions::Textures:
+		boxTech = Effects::BasicFX->Light3TexAlphaClipTech;
+		landAndWavesTech = Effects::BasicFX->Light3TexTech;
+		break;
+	case RenderOptions::TexturesAndFog:
+		boxTech = Effects::BasicFX->Light3TexAlphaClipFogTech;
+		landAndWavesTech = Effects::BasicFX->Light3TexFogTech;
+		break;
+	}
  
-    ID3DX11EffectTechnique* activeTech = Effects::BasicFX->Light3TexTech;
     D3DX11_TECHNIQUE_DESC techDesc;
-    activeTech->GetDesc(&techDesc);
+    boxTech->GetDesc(&techDesc);
+    for(uint32 p = 0; p < techDesc.Passes; ++p)
+    {
+        //Draw the box with alpha clipping
+        m_dxImmediateContext->IASetVertexBuffers(0, 1, m_boxVB.GetAddressOf(), &stride, &offset);
+        m_dxImmediateContext->IASetIndexBuffer(m_boxIB.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+        // Set per object constants.
+		XMMATRIX world = XMLoadFloat4x4(&m_boxWorld);
+		XMMATRIX worldInvTranspose = MathHelper::InverseTranspose(world);
+		XMMATRIX worldViewProj = world*view*proj;
+		
+		Effects::BasicFX->SetWorld(world);
+		Effects::BasicFX->SetWorldInvTranspose(worldInvTranspose);
+		Effects::BasicFX->SetWorldViewProj(worldViewProj);
+		Effects::BasicFX->SetTexTransform(XMMatrixIdentity());
+		Effects::BasicFX->SetMaterial(m_boxMat);
+		Effects::BasicFX->SetDiffuseMap(m_boxMapSRV.Get());
+
+        //Disable backface culling to render the crate properly (else the back of the crate won't be rendered)
+        m_dxImmediateContext->RSSetState(RenderStates::NoCullRS.Get());
+        boxTech->GetPassByIndex(p)->Apply(0, m_dxImmediateContext.Get());
+		m_dxImmediateContext->DrawIndexed(36, 0, 0);
+
+		// Restore default render state.
+		m_dxImmediateContext->RSSetState(0);
+    }
+
+    //Draw the hills and water with texture and fog (no alpha clipping needed)
+    landAndWavesTech->GetDesc(&techDesc);
     for(uint32 p = 0; p < techDesc.Passes; ++p)
     {
         //Draw the land
@@ -380,7 +520,7 @@ void TexturedWavesApp::DrawScene()
         Effects::BasicFX->SetMaterial(m_landMat);
         Effects::BasicFX->SetDiffuseMap(m_grassMapSRV.Get());
 
-        activeTech->GetPassByIndex(p)->Apply(0, m_dxImmediateContext.Get());
+        landAndWavesTech->GetPassByIndex(p)->Apply(0, m_dxImmediateContext.Get());
         m_dxImmediateContext->DrawIndexed(m_landIndexCount, 0, 0);
 
         //Draw the wave
@@ -398,8 +538,17 @@ void TexturedWavesApp::DrawScene()
         Effects::BasicFX->SetMaterial(m_wavesMat);
         Effects::BasicFX->SetDiffuseMap(m_wavesMapSRV.Get());
 
-        activeTech->GetPassByIndex(p)->Apply(0, m_dxImmediateContext.Get());
+        m_dxImmediateContext->OMSetBlendState(RenderStates::TransparentBS.Get(), blendFactor, 0xffffffff);
+
+        //This prevent the water from being rendered because this disable the first sample and 
+        //multisampling is not enabled...
+        //m_dxImmediateContext->OMSetBlendState(RenderStates::TransparentBS.Get(), blendFactor, 0xfffffffe);
+
+        landAndWavesTech->GetPassByIndex(p)->Apply(0, m_dxImmediateContext.Get());
         m_dxImmediateContext->DrawIndexed(3*m_waves.TriangleCount(), 0, 0);
+
+		// Restore default blend state
+		m_dxImmediateContext->OMSetBlendState(0, blendFactor, 0xffffffff);
     }
 
 	HR(m_swapChain->Present(0, 0));

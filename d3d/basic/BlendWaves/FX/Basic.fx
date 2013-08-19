@@ -134,6 +134,9 @@ float4 PS(VertexOut pin, uniform int gLightCount, uniform bool gUseTexure, unifo
 
 	if( gFogEnabled )
 	{
+        //Saturate return a value between [0, 1] 
+        //0 = litcolor (no Fog)
+        //1 = fogColor (completely hide the surface)
 		float fogLerp = saturate( (distToEye - gFogStart) / gFogRange ); 
 
 		// Blend the fog color and the lit color.
