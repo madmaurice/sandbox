@@ -10,6 +10,8 @@
 #include <d3dx11.h>
 #include <xnamath.h>
 #include <dxerr.h>
+#include <vector>
+#include "types.h"
 
 #if defined(DEBUG) || defined(_DEBUG)
 	#ifndef HR
@@ -28,6 +30,26 @@
 	#define HR(x) (x)
 	#endif
 #endif 
+
+//---------------------------------------------------------------------------------------
+// Utility classes.
+//---------------------------------------------------------------------------------------
+
+class dxHelper
+{
+public:
+	///<summary>
+	/// 
+	/// Does not work with compressed formats.
+	///</summary>
+	static ID3D11ShaderResourceView* CreateTexture2DArraySRV( ID3D11Device* device, ID3D11DeviceContext* context, 
+        std::vector<std::string>& filenames, 
+        DXGI_FORMAT format = DXGI_FORMAT_FROM_FILE, 
+        uint32 filter = D3DX11_FILTER_NONE, 
+        uint32 mipFilter = D3DX11_FILTER_LINEAR);
+
+	static ID3D11ShaderResourceView* CreateRandomTexture1DSRV(ID3D11Device* device);
+};
 
 namespace oc
 {
