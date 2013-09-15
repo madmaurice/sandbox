@@ -565,7 +565,7 @@ void GeometryGenerator::CreateFullscreenQuad(MeshData& meshData)
 	meshData.vertices.resize(4);
 	meshData.indices.resize(6);
 
-	// Position coordinates specified in NDC space.
+	// Position coordinates specified in NDC space (normalized device space).
 	meshData.vertices[0] = Vertex(
 		-1.0f, -1.0f, 0.0f, 
 		0.0f, 0.0f, -1.0f,
