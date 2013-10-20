@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{72D144BB-808A-4324-AF75-2D6429974B23}</ProjectGuid>
     <RootNamespace>Mirror</RootNamespace>
+    <ProjectName>10 - Mirror</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{18FFB9A2-D54E-4306-B08C-33C5C50B5F5E}</ProjectGuid>
     <RootNamespace>CSBlurWaves</RootNamespace>
+    <ProjectName>12 - CSBlurWaves</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

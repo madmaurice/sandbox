@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{18DE9678-3349-4C22-B3C1-12C6F00DDB96}</ProjectGuid>
     <RootNamespace>Waves</RootNamespace>
+    <ProjectName>6 - Waves</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

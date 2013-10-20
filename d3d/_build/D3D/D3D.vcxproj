@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{65482E88-38C9-4D39-ACDE-2DD38474FA6B}</ProjectGuid>
     <RootNamespace>D3D</RootNamespace>
+    <ProjectName>4 - D3D</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

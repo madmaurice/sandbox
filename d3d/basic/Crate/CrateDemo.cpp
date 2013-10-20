@@ -169,7 +169,8 @@ void CrateDemo::InitGeometryBuffers()
 
 
 void CrateDemo::InitFX()
-{    // Must init Effects first since InputLayouts depend on shader signatures.
+{
+    // Must init Effects first since InputLayouts depend on shader signatures.
     Effects::InitAll(m_dxDevice.Get());
     InputLayouts::InitAll(m_dxDevice.Get());
 

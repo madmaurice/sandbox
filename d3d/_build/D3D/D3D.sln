@@ -1,33 +1,37 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "D3D", "D3D.vcxproj", "{65482E88-38C9-4D39-ACDE-2DD38474FA6B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "4 - D3D", "D3D.vcxproj", "{65482E88-38C9-4D39-ACDE-2DD38474FA6B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "box", "..\..\box\box.vcxproj", "{DD78BC90-A4E3-4D4F-BFCC-D00D98FD230F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "6 - box", "..\..\box\box.vcxproj", "{DD78BC90-A4E3-4D4F-BFCC-D00D98FD230F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hills", "..\..\basic\Hills\Hills.vcxproj", "{DD1135CA-683F-46DC-B5B6-C4DFE0044004}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "6 - Hills", "..\..\basic\Hills\Hills.vcxproj", "{DD1135CA-683F-46DC-B5B6-C4DFE0044004}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shapes", "..\..\basic\Shapes\Shapes.vcxproj", "{2A88E167-AB24-48FC-8300-B3CBA30A501F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "6 - Shapes", "..\..\basic\Shapes\Shapes.vcxproj", "{2A88E167-AB24-48FC-8300-B3CBA30A501F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Waves", "..\..\basic\Waves\Waves.vcxproj", "{18DE9678-3349-4C22-B3C1-12C6F00DDB96}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "6 - Waves", "..\..\basic\Waves\Waves.vcxproj", "{18DE9678-3349-4C22-B3C1-12C6F00DDB96}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lighting", "..\..\basic\Lighting\Lighting.vcxproj", "{96700A58-FE6F-4552-A99D-F4FA45C61095}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "7- Lighting", "..\..\basic\Lighting\Lighting.vcxproj", "{96700A58-FE6F-4552-A99D-F4FA45C61095}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LitSkull", "..\..\basic\LitSkull\LitSkull.vcxproj", "{01BE75AE-3F5C-428D-B78A-8B74AA645A05}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "7 -LitSkull", "..\..\basic\LitSkull\LitSkull.vcxproj", "{01BE75AE-3F5C-428D-B78A-8B74AA645A05}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Crate", "..\..\basic\Crate\Crate.vcxproj", "{2CC3078C-630F-4B2A-A0CE-1F0B947B1677}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "8 - Crate", "..\..\basic\Crate\Crate.vcxproj", "{2CC3078C-630F-4B2A-A0CE-1F0B947B1677}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TexturedWaves", "..\..\basic\TexturedWaves\TexturedWaves.vcxproj", "{88773D28-CBB7-4799-BB74-A336EACD7F4A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "8 - TexturedWaves", "..\..\basic\TexturedWaves\TexturedWaves.vcxproj", "{88773D28-CBB7-4799-BB74-A336EACD7F4A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlendWaves", "..\..\basic\BlendWaves\BlendWaves.vcxproj", "{3347A8EE-4A4F-4383-A0F1-E3BC6805331B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "9 - BlendWaves", "..\..\basic\BlendWaves\BlendWaves.vcxproj", "{3347A8EE-4A4F-4383-A0F1-E3BC6805331B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mirror", "..\..\basic\Mirror\Mirror.vcxproj", "{72D144BB-808A-4324-AF75-2D6429974B23}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "10 - Mirror", "..\..\basic\Mirror\Mirror.vcxproj", "{72D144BB-808A-4324-AF75-2D6429974B23}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TreeBillboard", "..\..\basic\TreeBillboard\TreeBillboard.vcxproj", "{C20EB732-32CB-4BF1-806D-674D8D58C36B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "11 - TreeBillboard", "..\..\basic\TreeBillboard\TreeBillboard.vcxproj", "{C20EB732-32CB-4BF1-806D-674D8D58C36B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CSVecAdd", "..\..\basic\CSVecAdd\CSVecAdd.vcxproj", "{1040983D-BF60-4A73-B7B3-49D043711E18}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "12 - CSVecAdd", "..\..\basic\CSVecAdd\CSVecAdd.vcxproj", "{1040983D-BF60-4A73-B7B3-49D043711E18}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CSBlurWaves", "..\..\basic\CSBlurWaves\CSBlurWaves.vcxproj", "{18FFB9A2-D54E-4306-B08C-33C5C50B5F5E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "12 - CSBlurWaves", "..\..\basic\CSBlurWaves\CSBlurWaves.vcxproj", "{18FFB9A2-D54E-4306-B08C-33C5C50B5F5E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "13 - BasicTessellation", "..\..\basic\BasicTessellation\BasicTessellation.vcxproj", "{7039D4A1-2862-43AE-9188-2BE14E7BFD87}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "14 - Camera", "..\..\topics\Camera\Camera.vcxproj", "{16CBAEDE-BA3C-41F3-93B9-F3EBA2332977}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +95,14 @@ Global
 		{18FFB9A2-D54E-4306-B08C-33C5C50B5F5E}.Debug|Win32.Build.0 = Debug|Win32
 		{18FFB9A2-D54E-4306-B08C-33C5C50B5F5E}.Release|Win32.ActiveCfg = Release|Win32
 		{18FFB9A2-D54E-4306-B08C-33C5C50B5F5E}.Release|Win32.Build.0 = Release|Win32
+		{7039D4A1-2862-43AE-9188-2BE14E7BFD87}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7039D4A1-2862-43AE-9188-2BE14E7BFD87}.Debug|Win32.Build.0 = Debug|Win32
+		{7039D4A1-2862-43AE-9188-2BE14E7BFD87}.Release|Win32.ActiveCfg = Release|Win32
+		{7039D4A1-2862-43AE-9188-2BE14E7BFD87}.Release|Win32.Build.0 = Release|Win32
+		{16CBAEDE-BA3C-41F3-93B9-F3EBA2332977}.Debug|Win32.ActiveCfg = Debug|Win32
+		{16CBAEDE-BA3C-41F3-93B9-F3EBA2332977}.Debug|Win32.Build.0 = Debug|Win32
+		{16CBAEDE-BA3C-41F3-93B9-F3EBA2332977}.Release|Win32.ActiveCfg = Release|Win32
+		{16CBAEDE-BA3C-41F3-93B9-F3EBA2332977}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

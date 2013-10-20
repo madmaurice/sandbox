@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{01BE75AE-3F5C-428D-B78A-8B74AA645A05}</ProjectGuid>
-    <RootNamespace>LitSkull</RootNamespace>
-    <ProjectName>7 -LitSkull</ProjectName>
+    <ProjectGuid>{7039D4A1-2862-43AE-9188-2BE14E7BFD87}</ProjectGuid>
+    <RootNamespace>BasicTessellation</RootNamespace>
+    <ProjectName>13 - BasicTessellation</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -25,7 +25,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v110_xp</PlatformToolset>
+    <PlatformToolset>v110</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -67,10 +67,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <FxCompile Include="FX\Basic.fx" />
-    <FxCompile Include="FX\LightHelper.fx" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\..\common\comPtr.h" />
     <ClInclude Include="..\..\common\config.h" />
     <ClInclude Include="..\..\common\demoApp.h" />
@@ -83,19 +79,28 @@
     <ClInclude Include="..\..\common\types.h" />
     <ClInclude Include="..\..\common\waves.h" />
     <ClInclude Include="effects.h" />
+    <ClInclude Include="renderStates.h" />
     <ClInclude Include="vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\common\demoApp.cpp" />
     <ClCompile Include="..\..\common\dxApp.cpp" />
+    <ClCompile Include="..\..\common\dxUtil.cpp" />
     <ClCompile Include="..\..\common\geometryGenerator.cpp" />
     <ClCompile Include="..\..\common\lightHelper.cpp" />
     <ClCompile Include="..\..\common\mathHelper.cpp" />
     <ClCompile Include="..\..\common\timer.cpp" />
     <ClCompile Include="..\..\common\waves.cpp" />
     <ClCompile Include="effects.cpp" />
-    <ClCompile Include="LitSkull.cpp" />
+    <ClCompile Include="renderStates.cpp" />
+    <ClCompile Include="TessellationDemo.cpp" />
     <ClCompile Include="vertex.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="FX\Basic.fx" />
+    <FxCompile Include="FX\Blur.fx" />
+    <FxCompile Include="FX\LightHelper.fx" />
+    <FxCompile Include="FX\Tessellation.fx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
