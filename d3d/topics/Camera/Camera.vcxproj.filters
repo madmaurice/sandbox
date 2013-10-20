@@ -45,10 +45,10 @@
     <ClInclude Include="effects.h" />
     <ClInclude Include="renderStates.h" />
     <ClInclude Include="vertex.h" />
-    <ClInclude Include="topicApp.h">
+    <ClInclude Include="..\..\common\camera.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\common\camera.h">
+    <ClInclude Include="..\..\common\topicApp.h">
       <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
@@ -80,13 +80,13 @@
     <ClCompile Include="effects.cpp" />
     <ClCompile Include="renderStates.cpp" />
     <ClCompile Include="vertex.cpp" />
-    <ClCompile Include="topicApp.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\common\camera.cpp">
       <Filter>common</Filter>
     </ClCompile>
     <ClCompile Include="CameraApp.cpp" />
+    <ClCompile Include="..\..\common\topicApp.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="FX\Basic.fx">

@@ -77,11 +77,11 @@
     <ClInclude Include="..\..\common\lightHelper.h" />
     <ClInclude Include="..\..\common\mathHelper.h" />
     <ClInclude Include="..\..\common\timer.h" />
+    <ClInclude Include="..\..\common\topicApp.h" />
     <ClInclude Include="..\..\common\types.h" />
     <ClInclude Include="..\..\common\waves.h" />
     <ClInclude Include="effects.h" />
     <ClInclude Include="renderStates.h" />
-    <ClInclude Include="topicApp.h" />
     <ClInclude Include="vertex.h" />
   </ItemGroup>
   <ItemGroup>
@@ -93,11 +93,11 @@
     <ClCompile Include="..\..\common\lightHelper.cpp" />
     <ClCompile Include="..\..\common\mathHelper.cpp" />
     <ClCompile Include="..\..\common\timer.cpp" />
+    <ClCompile Include="..\..\common\topicApp.cpp" />
     <ClCompile Include="..\..\common\waves.cpp" />
     <ClCompile Include="CameraApp.cpp" />
     <ClCompile Include="effects.cpp" />
     <ClCompile Include="renderStates.cpp" />
-    <ClCompile Include="topicApp.cpp" />
     <ClCompile Include="vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
