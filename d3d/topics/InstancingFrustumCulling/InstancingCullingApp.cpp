@@ -408,7 +408,7 @@ void InstancingCullingApp::DrawScene()
     {
         ID3DX11EffectPass* pass = activeTech->GetPassByIndex( p );
 
-        m_dxImmediateContext->IASetVertexBuffers(0, 2, test, stride, offset);
+        m_dxImmediateContext->IASetVertexBuffers(0, 2, vbs, stride, offset);
         m_dxImmediateContext->IASetIndexBuffer(m_skullIB.Get(), DXGI_FORMAT_R32_UINT, 0);
 
         XMMATRIX world = XMLoadFloat4x4(&m_skullWorld);

@@ -2,7 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="common">
-      <UniqueIdentifier>{70834128-bc9e-4258-98c6-d8fdb60b107b}</UniqueIdentifier>
+      <UniqueIdentifier>{ad052858-a1f2-4d1a-b166-6dc3d697f0a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FX">
+      <UniqueIdentifier>{46239461-bf69-4e50-9b64-e78e05989b20}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -39,6 +42,10 @@
     <ClCompile Include="..\..\common\xnacollision.cpp">
       <Filter>common</Filter>
     </ClCompile>
+    <ClCompile Include="effects.cpp" />
+    <ClCompile Include="PickingApp.cpp" />
+    <ClCompile Include="renderStates.cpp" />
+    <ClCompile Include="vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\common\camera.h">
@@ -83,5 +90,16 @@
     <ClInclude Include="..\..\common\xnacollision.h">
       <Filter>common</Filter>
     </ClInclude>
+    <ClInclude Include="effects.h" />
+    <ClInclude Include="renderStates.h" />
+    <ClInclude Include="vertex.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="FX\Basic.fx">
+      <Filter>FX</Filter>
+    </FxCompile>
+    <FxCompile Include="FX\LightHelper.fx">
+      <Filter>FX</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

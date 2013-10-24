@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{069F557C-23B2-43DE-B2D4-4B6A4C25F17E}</ProjectGuid>
+    <ProjectGuid>{D4CCC50F-6250-4857-A6E9-5CEB86C70723}</ProjectGuid>
     <RootNamespace>Picking</RootNamespace>
     <ProjectName>16 - Picking</ProjectName>
   </PropertyGroup>
@@ -34,9 +34,11 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\_build\D3D\D3D.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\_build\D3D\D3DRel.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -76,6 +78,10 @@
     <ClCompile Include="..\..\common\topicApp.cpp" />
     <ClCompile Include="..\..\common\waves.cpp" />
     <ClCompile Include="..\..\common\xnacollision.cpp" />
+    <ClCompile Include="effects.cpp" />
+    <ClCompile Include="PickingApp.cpp" />
+    <ClCompile Include="renderStates.cpp" />
+    <ClCompile Include="vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\common\camera.h" />
@@ -92,6 +98,13 @@
     <ClInclude Include="..\..\common\types.h" />
     <ClInclude Include="..\..\common\waves.h" />
     <ClInclude Include="..\..\common\xnacollision.h" />
+    <ClInclude Include="effects.h" />
+    <ClInclude Include="renderStates.h" />
+    <ClInclude Include="vertex.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="FX\Basic.fx" />
+    <FxCompile Include="FX\LightHelper.fx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -58,7 +58,7 @@ private:
 	ComPtr<ID3D11ShaderResourceView> m_inputBSRV;
 	ComPtr<ID3D11UnorderedAccessView> m_outputUAV;
 
-	uint32 m_numElements;
+	int32 m_numElements;
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,

@@ -35,6 +35,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "14 - Camera", "..\..\topics
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "15 - InstancingFrustumCulling", "..\..\topics\InstancingFrustumCulling\InstancingFrustumCulling.vcxproj", "{A02FAFB7-6E70-44FE-9EC7-3795F322593D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "16 - Picking", "..\..\topics\Picking\Picking.vcxproj", "{D4CCC50F-6250-4857-A6E9-5CEB86C70723}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -109,6 +111,10 @@ Global
 		{A02FAFB7-6E70-44FE-9EC7-3795F322593D}.Debug|Win32.Build.0 = Debug|Win32
 		{A02FAFB7-6E70-44FE-9EC7-3795F322593D}.Release|Win32.ActiveCfg = Release|Win32
 		{A02FAFB7-6E70-44FE-9EC7-3795F322593D}.Release|Win32.Build.0 = Release|Win32
+		{D4CCC50F-6250-4857-A6E9-5CEB86C70723}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D4CCC50F-6250-4857-A6E9-5CEB86C70723}.Debug|Win32.Build.0 = Debug|Win32
+		{D4CCC50F-6250-4857-A6E9-5CEB86C70723}.Release|Win32.ActiveCfg = Release|Win32
+		{D4CCC50F-6250-4857-A6E9-5CEB86C70723}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
