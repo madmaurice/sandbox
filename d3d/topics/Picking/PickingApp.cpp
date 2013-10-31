@@ -253,9 +253,11 @@ void PickingApp::Pick(int sx, int sy)
     float vx = pointX/P(0,0);
     float vy = pointY/P(1,1);
 
-    // TODO : check this (rayDir with vx and vy...)
     // Ray definition in view space.
-	XMVECTOR rayOrigin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	XMVECTOR rayOrigin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f); //eye sit at origin in view space
+    // vx and vy correspond to point that was picked in view space.
+    // To visualize this, imagine looking at a point (ex: ceiling) and the origin being the eye
+    // The vector from the eye to the point is (vx, vy, 1.0) (z = 1.0 since cam is facing z+) see page 537
 	XMVECTOR rayDir    = XMVectorSet(vx, vy, 1.0f, 0.0f);
 
 	// Tranform ray to local space of Mesh.
@@ -267,9 +269,8 @@ void PickingApp::Pick(int sx, int sy)
 
 	XMMATRIX toLocal = XMMatrixMultiply(invView, invWorld);
 
-    // TODO : check this (rayDir Normal?)
-    rayOrigin = XMVector3TransformCoord(rayOrigin, toLocal);
-	rayDir = XMVector3TransformNormal(rayDir, toLocal);
+    rayOrigin = XMVector3TransformCoord(rayOrigin, toLocal); //Ignore w component of input vector and use 1.0 (point)
+	rayDir = XMVector3TransformNormal(rayDir, toLocal); //Ignore translation (w = 0)
 
 	// Make the ray direction unit length for the intersection tests.
 	rayDir = XMVector3Normalize(rayDir);
@@ -283,6 +284,7 @@ void PickingApp::Pick(int sx, int sy)
 	// Assume we have not picked anything yet, so init to -1.
     m_pickedTriangle = -1;
 	float tmin = 0.0f;
+    // Check for AABB first to avoid looking through all triangles
     if(XNA::IntersectRayAxisAlignedBox(rayOrigin, rayDir, &m_meshBox, &tmin))
 	{
 		// Find the nearest ray/triangle intersection.
