@@ -13,6 +13,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>d3d11.lib;d3dx11d.lib;D3DCompiler.lib;dxerr.lib;Effects11d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <FxCompile>
       <EntryPointName />

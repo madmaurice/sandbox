@@ -10,6 +10,7 @@
   <ItemDefinitionGroup>
     <Link>
       <AdditionalDependencies>d3d11.lib;d3dx11.lib;D3DCompiler.lib;dxerr.lib;Effects11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>$(DXSDK_DIR)\Include;$(SolutionDir)\..\..\common;$(SolutionDir)\..\..\Effects11\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

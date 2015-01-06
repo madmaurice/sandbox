@@ -223,8 +223,7 @@ void CSVecAdd::DoComputeWork()
 	ID3D11ShaderResourceView* nullSRV[1] = { 0 };
     m_dxImmediateContext->CSSetShaderResources( 0, 1, nullSRV );
 
-	// Unbind output from compute shader (we are going to use this output as an input in the next pass, 
-	// and a resource cannot be both an output and input at the same time.
+	// Unbind output from compute shader
 	ID3D11UnorderedAccessView* nullUAV[1] = { 0 };
 	m_dxImmediateContext->CSSetUnorderedAccessViews( 0, 1, nullUAV, 0 );
 
